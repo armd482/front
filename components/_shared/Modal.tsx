@@ -11,9 +11,19 @@ interface ModalProps {
   description?: string;
   children: ReactNode;
   className?: string;
+  hidden?: boolean;
 }
 
-export default function Modal({ children, className, description, isOpen, onClose, position, title }: ModalProps) {
+export default function Modal({
+  children,
+  className,
+  description,
+  hidden,
+  isOpen,
+  onClose,
+  position,
+  title,
+}: ModalProps) {
   const cn = {
     center: `
       top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md max-h-[85vh] rounded-lg 
@@ -30,9 +40,11 @@ export default function Modal({ children, className, description, isOpen, onClos
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className='animate-in fade-in fixed inset-0 z-2101 bg-[rgba(128,134,139,0.5)] duration-200' />
+        <Dialog.Overlay
+          className={`animate-in fade-in fixed inset-0 z-2101 hidden bg-[rgba(128,134,139,0.5)] duration-200 ${hidden && 'hidden'}`}
+        />
         <Dialog.Content
-          className={`animate-in fixed z-2102 overflow-hidden bg-white shadow-2xl duration-300 outline-none ${cn[position]} ${className}`}
+          className={`animate-in fixed z-2102 max-h-svh max-w-svw overflow-hidden bg-white shadow-2xl duration-300 outline-none ${cn[position]} ${className} ${hidden && 'hidden'}`}
         >
           <Dialog.Title className='sr-only'>{title || 'Modal'}</Dialog.Title>
           <Dialog.Description className='sr-only'>{description || 'Modal Content'}</Dialog.Description>

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 
 import * as Icon from '@/asset/svg';
 import { ButtonTag } from '@/components';
@@ -11,6 +11,7 @@ interface CaptureButtonProperties {
 }
 
 export default function CaptureButton({ imgSrc, onImageChange, onVisible }: CaptureButtonProperties) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isClicked, setIsClicked] = useState(false);
 
   const handleCaptureButtonClick = async () => {
@@ -44,10 +45,9 @@ export default function CaptureButton({ imgSrc, onImageChange, onVisible }: Capt
         video.remove();
         canvas.remove();
         stream?.getTracks().forEach((track) => track.stop());
-        onVisible(true);
       };
     } catch {
-      return;
+      inputRef.current?.click();
     } finally {
       onVisible(true);
       setIsClicked(false);
@@ -56,6 +56,19 @@ export default function CaptureButton({ imgSrc, onImageChange, onVisible }: Capt
 
   const handleRemoveButtonClick = () => {
     onImageChange(null);
+  };
+
+  const handleImageInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      onImageChange(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -94,6 +107,7 @@ export default function CaptureButton({ imgSrc, onImageChange, onVisible }: Capt
           </button>
         </>
       )}
+      <input accept='image/*' hidden={true} ref={inputRef} type='file' onChange={handleImageInput} />
     </div>
   );
 }

@@ -55,14 +55,6 @@ export default function Header() {
     closeMenu('feedback');
   };
 
-  const handleFeedback = (value: boolean) => {
-    if (value) {
-      toggleMenu('feedback');
-      return;
-    }
-    closeMenu('feedback');
-  };
-
   const BUTTON_LIST = [
     {
       icon: <Icon.Feedback {...ICON_PROPS} />,
@@ -99,7 +91,7 @@ export default function Header() {
         ))}
         {/* {client && <InfoMenu />} */}
       </div>
-      <Feedback handleOpen={handleFeedback} isOpen={menuStatus.feedback} onClose={handleFeedbackClose} />
+      <Feedback isOpen={menuStatus.feedback} onClose={handleFeedbackClose} />
     </div>
   );
 }

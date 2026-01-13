@@ -9,7 +9,6 @@ import { CategoryType } from '@/types/menuType';
 
 interface BaseContentProperties {
   onClick: (value: CategoryType) => void;
-  onClose: () => void;
 }
 
 interface ButtonType {
@@ -23,29 +22,14 @@ const BUTTON: ButtonType[] = [
   { icon: Icon.SuggestIdea, name: '아이디어 제안', value: 'suggest' },
 ];
 
-export default function BaseContent({ onClick, onClose }: BaseContentProperties) {
+export default function BaseContent({ onClick }: BaseContentProperties) {
   const handleButtonClick = (e: MouseEvent<HTMLButtonElement>, value: null | 'report' | 'suggest') => {
     e.stopPropagation();
     onClick(value);
   };
 
-  const handleCloseButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    onClose();
-  };
-
   return (
     <div className='font-googleSans size-full overflow-auto bg-white'>
-      <div className='flex items-center justify-between px-5 py-2'>
-        <h1 className='text-custom-gray text-lg'>의견 보내기</h1>
-        <button
-          className='flex size-12 items-center justify-center rounded-full'
-          type='button'
-          onClick={handleCloseButtonClick}
-        >
-          <Icon.Delete fill='#444746' height={24} width={24} />
-        </button>
-      </div>
       <div className='pt-4'>
         <div className='mb-5 flex justify-center'>
           <Image alt='header' height={160} src={image.feedbackHeader} width={240} />
