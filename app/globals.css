@@ -66,6 +66,8 @@
   --animate-slide-in-bottom: slide-in-bottom 0.3s ease forwards;
   --animate-slide-in-left: slide-in-left 0.3s ease forwards;
   --animate-slide-out-left: slide-out-left 0.3s ease forwards;
+
+  --size-full: 100svw 100svh;
 }
 
 @layer base {
