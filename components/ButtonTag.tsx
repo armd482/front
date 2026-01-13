@@ -45,7 +45,7 @@ export default function ButtonTag({
     setIsDrag(false);
   };
   return (
-    <div className='relative w-full' onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
+    <div className='relative' onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
       {children}
       {isDrag && (
         <div

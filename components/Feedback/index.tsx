@@ -9,7 +9,13 @@ import Suggest from './Suggest';
 
 import Modal from '@/components/_shared/Modal';
 
-export default function Feedback({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+interface FeedbackProps {
+  isOpen: boolean;
+  onClose: () => void;
+  handleOpen: (value: boolean) => void;
+}
+
+export default function Feedback({ handleOpen, isOpen, onClose }: FeedbackProps) {
   const [category, setCategory] = useState<null | 'report' | 'suggest'>(null);
   const [isCompletedForm, setIsCompletedForm] = useState(false);
 
@@ -19,18 +25,23 @@ export default function Feedback({ isOpen, onClose }: { isOpen: boolean; onClose
   };
 
   return (
-    <Modal description='의견이나 문제점을 보내주세요.' isOpen={isOpen} title='서비스 피드백' onClose={handleClose}>
+    <Modal
+      description='의견이나 문제점을 보내주세요.'
+      isOpen={isOpen}
+      position='right'
+      title='서비스 피드백'
+      onClose={handleClose}
+    >
       {!category ? (
         <BaseContent onClick={setCategory} onClose={handleClose} />
       ) : (
         <div className='flex size-full flex-col'>
           <Header type={category} onClick={setCategory} onClose={handleClose} />
-
           <div className='flex-1 overflow-auto p-4'>
             {category === 'report' ? (
-              <Report onComplete={setIsCompletedForm} onVisible={() => {}} />
+              <Report onComplete={setIsCompletedForm} onVisible={handleOpen} />
             ) : (
-              <Suggest onComplete={setIsCompletedForm} onVisible={() => {}} />
+              <Suggest onComplete={setIsCompletedForm} onVisible={handleOpen} />
             )}
           </div>
 

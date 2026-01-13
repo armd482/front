@@ -1,12 +1,13 @@
 import Link from 'next/link';
 
+import Header from './_components/Header';
 import NewMeetingButton from './_components/NewMeetingButton';
 import ParticipateMeetingForm from './_components/ParticipantMeetingForm';
 
 export default function Page() {
   return (
     <div className='flex size-full flex-col'>
-      <header>헤더</header>
+      <Header />
       <div className='relative flex flex-1 items-center justify-center'>
         <div className='max-w-163.75 shrink px-[3em] py-[1em]'>
           <div className='font-googleSans text-4.5xl pb-2 leading-13'>모든 사용자를 위한 영상 통화 및 화상 회의</div>

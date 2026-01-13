@@ -25,10 +25,10 @@ export default function Header({ onClick, onClose, type }: HeaderProperties) {
 
   return (
     <div
-      className='font-googleSans flex h-15 items-center justify-between pt-2 pr-3 pb-1 pl-1'
+      className='font-googleSans flex h-15 items-center justify-between gap-2 pt-2 pr-3 pb-1 pl-1'
       style={{ boxShadow: '0 1px 4px rgba(48,48,48,.3)' }}
     >
-      <div className='flex items-center justify-center'>
+      <div className='flex w-full items-center gap-2'>
         <ButtonTag name='뒤로' position='bottom'>
           <button
             className='flex size-12 items-center justify-center rounded-full hover:bg-[#F8F8F8] active:bg-[#E9E9E9]'
