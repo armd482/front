@@ -1,0 +1,193 @@
+'use client';
+
+import { useCallback } from 'react';
+
+import { getCurrentDeviceInfo } from '@/lib/device';
+import { useDeviceStore } from '@/store/useDeviceStore';
+import { DeviceKindType } from '@/types/deviceType';
+
+const useDevice = () => {
+  const setMediaStream = useCallback(async (stream: MediaStream | null) => {
+    const deviceInfo = await getCurrentDeviceInfo(stream);
+
+    useDeviceStore.setState({ device: deviceInfo.device, deviceList: deviceInfo.deviceList, stream });
+  }, []);
+
+  const getStream = useCallback(
+    async (constraints?: MediaStreamConstraints) => {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      await setMediaStream(stream);
+      useDeviceStore.setState({ status: 'success' });
+      return stream;
+    },
+    [setMediaStream],
+  );
+
+  const replaceNewTrack = useCallback(
+    async (type: DeviceKindType, deviceId: string, isExact = true) => {
+      const { stream } = useDeviceStore.getState();
+      if (!stream) {
+        return;
+      }
+
+      try {
+        const trackStream = await navigator.mediaDevices.getUserMedia({
+          [type]: { deviceId: isExact ? { exact: deviceId } : { ideal: deviceId } },
+        });
+        const newTrack = trackStream.getTracks().find((t) => t.kind === type);
+        const oldTrack = stream.getTracks().find((t) => t.kind === type);
+
+        if (newTrack) {
+          stream.addTrack(newTrack);
+        }
+
+        if (oldTrack) {
+          oldTrack.stop();
+          stream.removeTrack(oldTrack);
+        }
+
+        const updateStream = new MediaStream(stream.getTracks());
+        await setMediaStream(updateStream);
+        return updateStream;
+      } catch (e) {
+        if (isExact) return replaceNewTrack(type, deviceId, false);
+        throw e;
+      }
+    },
+    [setMediaStream],
+  );
+
+  const initStream = useCallback(async () => {
+    const {
+      device: { audioInput, videoInput },
+      status,
+      stream: prevStream,
+    } = useDeviceStore.getState();
+
+    if (status === 'pending') {
+      return;
+    }
+
+    useDeviceStore.setState({ status: 'pending' });
+
+    if (prevStream) {
+      prevStream.getTracks().forEach((track) => track.stop());
+    }
+
+    try {
+      return await getStream({
+        audio: audioInput ? { deviceId: { exact: audioInput.deviceId } } : true,
+        video: videoInput ? { deviceId: { exact: videoInput.deviceId } } : true,
+      });
+    } catch (e) {
+      const error = e as DOMException;
+      if (error.name === 'NotAllowedError') {
+        useDeviceStore.setState({ status: 'rejected', stream: null });
+        return null;
+      }
+
+      if (error.name === 'OverconstrainedError' || error.name === 'NotFoundError') {
+        try {
+          return await getStream({
+            audio: audioInput ? { deviceId: { ideal: audioInput.deviceId } } : true,
+            video: videoInput ? { deviceId: { ideal: videoInput.deviceId } } : true,
+          });
+        } catch {
+          useDeviceStore.setState({ status: 'failed', stream: null });
+          return null;
+        }
+      }
+
+      try {
+        return await getStream({ audio: audioInput ? { deviceId: { exact: audioInput.deviceId } } : true });
+      } catch {
+        try {
+          return await getStream({
+            video: videoInput ? { deviceId: { exact: videoInput.deviceId } } : true,
+          });
+        } catch {
+          useDeviceStore.setState({ status: 'failed', stream: null });
+          return null;
+        }
+      }
+    }
+  }, [getStream]);
+
+  const replaceTrack = useCallback(
+    async (device: MediaDeviceInfo) => {
+      if (device.kind === 'audiooutput') {
+        const { changeDevice } = useDeviceStore.getState();
+        changeDevice('audioOutput', device);
+        return;
+      }
+      const type = device.kind === 'audioinput' ? 'audio' : 'video';
+      await replaceNewTrack(type, device.deviceId, true);
+    },
+    [replaceNewTrack],
+  );
+
+  const toggleAudioTrack = useCallback(() => {
+    const { deviceEnable, stream, toggleDeviceEnalbe } = useDeviceStore.getState();
+    if (!stream) {
+      return;
+    }
+    const prevEnable = deviceEnable.audio;
+    toggleDeviceEnalbe('audio');
+
+    stream.getAudioTracks().forEach((track) => {
+      track.enabled = !prevEnable;
+    });
+
+    return { ...deviceEnable, audio: !prevEnable };
+  }, []);
+
+  const toggleVideoTrack = useCallback(async () => {
+    const {
+      device: { videoInput },
+      deviceEnable,
+      stream,
+      toggleDeviceEnalbe,
+    } = useDeviceStore.getState();
+    if (!stream) {
+      return;
+    }
+
+    const prevEnable = deviceEnable.video;
+
+    toggleDeviceEnalbe('video');
+
+    if (!prevEnable) {
+      await replaceNewTrack('video', videoInput?.deviceId ?? '', true);
+      return;
+    }
+
+    stream.getVideoTracks().forEach((track) => {
+      track.stop();
+      stream.removeTrack(track);
+    });
+
+    return { ...deviceEnable, video: !prevEnable };
+  }, [replaceNewTrack]);
+
+  const initScreenStream = useCallback(async (audio: boolean) => {
+    const { screenStream } = useDeviceStore.getState();
+
+    if (screenStream) {
+      screenStream.getTracks().forEach((track) => track.stop());
+      useDeviceStore.setState({ screenStream: null });
+    }
+    const stream = await navigator.mediaDevices.getDisplayMedia({ audio });
+    useDeviceStore.setState({ screenStream: stream });
+    return stream;
+  }, []);
+
+  return {
+    initScreenStream,
+    initStream,
+    replaceTrack,
+    toggleAudioTrack,
+    toggleVideoTrack,
+  };
+};
+
+export default useDevice;

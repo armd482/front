@@ -29,11 +29,15 @@ export const getCurrentDeviceInfo = async (stream: MediaStream | null) => {
     currentAudioOutput ?? audioOutputList.find((d) => d.groupId === (defaultAudioOutput?.groupId ?? 'none')) ?? null;
 
   return {
-    audioInput,
-    audioInputList,
-    audioOutput,
-    audioOutputList,
-    videoInput,
-    videoInputList,
+    device: {
+      audioInput,
+      audioOutput,
+      videoInput,
+    },
+    deviceList: {
+      audioInput: audioInputList,
+      audioOutput: audioOutputList,
+      videoInput: videoInputList,
+    },
   };
 };
