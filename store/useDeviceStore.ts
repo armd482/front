@@ -5,6 +5,7 @@ import { DeviceType, DeviceEnableType, DeviceKindType, StatusType } from '@/type
 interface DeviceState {
   device: Record<DeviceType, MediaDeviceInfo | null>;
   deviceEnable: DeviceEnableType;
+  permission: Record<DeviceKindType, PermissionState>;
 
   deviceList: Record<DeviceType, MediaDeviceInfo[]>;
   status: StatusType;
@@ -15,6 +16,7 @@ interface DeviceState {
   changeDevice: (type: DeviceType, value: MediaDeviceInfo) => void;
   changeDeviceList: (type: DeviceType, value: MediaDeviceInfo[]) => void;
   toggleDeviceEnalbe: (type: DeviceKindType) => void;
+  updatePermission: (type: DeviceKindType, value: PermissionState) => void;
 
   stopStream: () => void;
   stopScreenStream: () => void;
@@ -37,6 +39,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     audioOutput: [],
     videoInput: [],
   },
+  permission: { audio: 'prompt', video: 'prompt' },
   screenStream: null,
   status: null,
   stopScreenStream: () => {
@@ -61,4 +64,5 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
   toggleDeviceEnalbe: (type) =>
     set((state) => ({ deviceEnable: { ...state.deviceEnable, [type]: !state.deviceEnable[type] } })),
+  updatePermission: (type, value) => set((state) => ({ permission: { ...state.permission, [type]: value } })),
 }));

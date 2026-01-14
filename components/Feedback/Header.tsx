@@ -24,7 +24,7 @@ export default function Header({ onClick, onClose, type }: HeaderProperties) {
   };
 
   return (
-    <div
+    <header
       className='font-googleSans flex h-15 items-center justify-between gap-2 pt-2 pr-3 pb-1 pl-1'
       style={{ boxShadow: '0 1px 4px rgba(48,48,48,.3)' }}
     >
@@ -54,6 +54,6 @@ export default function Header({ onClick, onClose, type }: HeaderProperties) {
           <Icon.Delete fill='#474747' height={24} width={24} />
         </button>
       </ButtonTag>
-    </div>
+    </header>
   );
 }

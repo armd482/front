@@ -7,7 +7,7 @@ import Header from './Header';
 import Report from './Report';
 import Suggest from './Suggest';
 
-import Modal from '@/components/_shared/Modal';
+import Dialog from '@/components/_shared/Dialog';
 
 interface FeedbackProps {
   isOpen: boolean;
@@ -29,7 +29,7 @@ export default function Feedback({ isOpen, onClose }: FeedbackProps) {
   }, []);
 
   return (
-    <Modal
+    <Dialog
       description='의견이나 문제점을 보내주세요.'
       hidden={!isVisible}
       isOpen={isOpen}
@@ -37,8 +37,8 @@ export default function Feedback({ isOpen, onClose }: FeedbackProps) {
       title='서비스 피드백'
       onClose={handleClose}
     >
+      <Header type={category} onClick={setCategory} onClose={handleClose} />
       <div className='flex size-full flex-col'>
-        <Header type={category} onClick={setCategory} onClose={handleClose} />
         <div className='flex-1 overflow-auto p-4'>
           {category === 'report' ? (
             <Report onComplete={setIsCompletedForm} onVisible={handleVisible} />
@@ -62,6 +62,6 @@ export default function Feedback({ isOpen, onClose }: FeedbackProps) {
           </div>
         )}
       </div>
-    </Modal>
+    </Dialog>
   );
 }
